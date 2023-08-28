@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import SpinnerLoading from '../utils/SpinnerLoading'
 
 const Mainbody = () => {
   const [carat, setCarat] = useState(1)
   const [width, setWidth] = useState(8)
   const [clarity, setClarity] = useState('')
   const [color, setColor] = useState('')
+  const [valuation, setValuation] = useState(null)
+
+  const [clarityErrorMessageOn, setClarityErrorMessageOn] = useState(false)
+  const [colorErrorMessageOn, setColorErrorMessageOn] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const [initialValues, setInitialValues] = useState({
     min_carat: 1,
@@ -20,6 +26,56 @@ const Mainbody = () => {
 
   const valuationButtonHandler = () => {
     console.log('Carat:' + carat + ' width: ' + width + ' clarity: ' + clarity + ' color: ' + color)
+    if (clarity === '') {
+      setClarityErrorMessageOn(true)
+    }
+
+    if (color === '') {
+      setColorErrorMessageOn(true)
+    }
+
+    if (clarity !== '' && color !== '') {
+      setIsLoading(true);
+      const url = `${apiBaseUrl}/getprice`
+      const diamondData = {
+        carat: carat,
+        y: width,
+        clarity: clarity,
+        color: color
+      }
+
+      axios.post(url, JSON.stringify(diamondData), {
+        headers: {
+          "Content-Type":"application/json"
+        }
+      }).then((response) => {
+        setIsLoading(false)
+        setValuation(response.data.price_prediciton)
+      }).catch((error) => {
+        setIsLoading(false)
+        console.log(error)
+      })
+    }
+  }
+
+  const clarityClickedHandler = (e) => {
+    setClarity(e.target.value)
+    setClarityErrorMessageOn(false)
+  }
+
+  const colorClickedHandler = (e) => {
+    setColor(e.target.value)
+    setColorErrorMessageOn(false)
+  }
+
+  const claritySelectedHandler = (value) => {
+    setClarity(value)
+    setClarityErrorMessageOn(false)
+  }
+
+  const colorSelectedHandler = (value) => {
+    setColor(value)
+    setColorErrorMessageOn(false)
   }
 
   useEffect(() => {
@@ -35,13 +91,17 @@ const Mainbody = () => {
           clarities: response.data.clarities,
           colors: response.data.colors
         })
-        console.log('Initial: ')
-        console.log(initialValues.min_y)
       })
       .catch((error) => {
         console.log(error)
       })
   }, [])
+
+  if (isLoading) {
+    return (
+      <SpinnerLoading />
+    )
+  }
 
   return (
     <div>
@@ -64,43 +124,93 @@ const Mainbody = () => {
               <div>
                 <label htmlFor="clarity" className='form-label lead'>Clarity (Worst to Best): {clarity}</label>
               </div>
-              <div className="btn-group mt-2" role="group" aria-label="clarity-label" id="clarity" onClick={(e) => setClarity(e.target.value)}>
-                <button type="button" className="btn btn-danger me-2" value="I1">I1</button>
-                <button type="button" className="btn btn-danger me-2" value="SI2">SI2</button>
-                <button type="button" className="btn btn-danger me-2" value="SI1">SI1</button>
+              <div className="btn-group mt-2" role="group" aria-label="clarity-label" id="clarity" onClick={(e) => clarityClickedHandler(e)}>
+                {
+                  initialValues.clarities.slice(0,3).map((clarity) => {
+                    return (
+                      <button type="button" className="btn btn-danger me-2" key={clarity} value={clarity}>{clarity}</button>
+                    )
+                  })
+                }
 
-                <button type="button" className="btn btn-warning me-2" value="VS2">VS2</button>
-                <button type="button" className="btn btn-warning me-2" value="VS1">VS1</button>
+                {
+                  initialValues.clarities.slice(3, 5).map((clarity) => {
+                    return (
+                      <button type="button" className="btn btn-warning me-2" key={clarity} value={clarity}>{clarity}</button>
+                    )
+                  })
+                }
 
-                <button type="button" className="btn btn-primary me-2" value="VVS2">VVS2</button>
-                <button type="button" className="btn btn-primary me-2" value="VVS1">VVS1</button>
-                <button type="button" className="btn btn-success" value="IF">IF</button>
+                {
+                  initialValues.clarities.slice(5, 7).map((clarity) => {
+                    return (
+                      <button type="button" className="btn btn-primary me-2" key={clarity} value={clarity}>{clarity}</button>
+                    )
+                  })
+                }
+                {
+                  initialValues.clarities.slice(7, 8).map((clarity) => {
+                    return (
+                      <button type="button" className="btn btn-success me-2" key={clarity} value={clarity}>{clarity}</button>
+                    )
+                  })
+                }
               </div>
             </div>
             <div className='mt-3'>
               <div>
                 <label htmlFor="color" className='form-label lead'>Color (Worst to Best): {color}</label>
               </div>
-              <div className="btn-group mt-2" role="group" aria-label="color-label" id="color" onClick={(e) => setColor(e.target.value)}>
-                <button type='button' className='btn btn-danger me-2' value='J'>J</button>
-                <button type='button' className='btn btn-danger me-2' value='I'>I</button>
+              <div className="btn-group mt-2" role="group" aria-label="color-label" id="color" onClick={(e) => colorClickedHandler(e)}>
+                {
+                  initialValues.colors.slice(0,2).map((color) => {
+                    return (
+                      <button type='button' className='btn btn-danger me-2' key={color} value={color}>{color}</button>
+                    )
+                  })
+                }
 
-                <button type='button' className='btn btn-primary me-2' value='H'>H</button>
-                <button type='button' className='btn btn-primary me-2' value='G'>G</button>
-                <button type='button' className='btn btn-primary me-2' value='F'>F</button>
+                {
+                  initialValues.colors.slice(2,5).map((color) => {
+                    return (
+                      <button type='button' className='btn btn-primary me-2' key={color} value={color}>{color}</button>
+                    )
+                  })
+                }
 
-                <button type='button' className='btn btn-success me-2' value='E'>E</button>
-                <button type='button' className='btn btn-success' value='D'>D</button>
+                {
+                  initialValues.colors.slice(5,6).map((color) => {
+                    return (
+                      <button type='button' className='btn btn-success me-2' key={color} value={color}>{color}</button>
+                    )
+                  })
+                }
+
+                {
+                  initialValues.colors.slice(6,7).map((color) => {
+                    return (
+                      <button type='button' className='btn btn-success' key={color} value={color}>{color}</button>
+                    )
+                  })
+                }
               </div>
             </div>
           </div>
         </div>
         <div className='mt-3'>
+          {clarityErrorMessageOn && <h5 className='text-danger'>Clarity is not selected</h5>}
+          {colorErrorMessageOn && <h5 className='text-danger'>Color is not selected</h5>}
+        </div>
+        <div className='mt-3'>
           <button type='button' className='btn btn-secondary' onClick={valuationButtonHandler}>Get Valuation</button>
         </div>
-        <div className='mt-5'>
-          <h2>Est. valuation is: 1800</h2>
-        </div>
+        {
+          valuation &&
+
+          <div className='m-3'>
+            <h2 className='text-success'>Est. valuation is USD {valuation}</h2>
+          </div>
+        }
       </div>
 
       <div className='container d-lg-none mt-4'>
@@ -120,21 +230,51 @@ const Mainbody = () => {
               <label htmlFor="clarity" className='form-label lead'>Clarity (Worst to Best): {clarity}</label>
             </div>
             <div className="dropdown">
-              <button className="btn btn-primary dropdown-toggle" type="button" id="clairtyButton" data-bs-toggle="dropdown"
+              <button className="btn btn-primary dropdown-toggle" type="button" id="clarityButton" data-bs-toggle="dropdown"
                 aria-expanded="false">
                 {clarity === '' ? 'Clarity' : clarity}
               </button>
-              <ul className="dropdown-menu" aria-labelledby="clairtyButton">
-                <li><a className="dropdown-item bg-danger border border-white" href="#" onClick={() => setClarity('I1')}>I1</a></li>
-                <li><a className="dropdown-item bg-danger border border-white" href="#" onClick={() => setClarity('SI2')}>SI2</a></li>
-                <li><a className="dropdown-item bg-danger border border-white" href="#" onClick={() => setClarity('SI1')}>SI1</a></li>
+              <ul className="dropdown-menu" aria-labelledby="clarityButton">
+                {
+                  initialValues.clarities.slice(0, 3).map((clarity) => {
+                    return (
+                      <li key={clarity}>
+                        <a href="#" className="dropdown-item bg-danger border border-white text-white" onClick={() => {claritySelectedHandler(clarity)}}>{clarity}</a>
+                      </li>
+                    )
+                  })
+                }
 
-                <li><a className="dropdown-item bg-warning border border-white" href="#" onClick={() => setClarity('VS2')}>VS2</a></li>
-                <li><a className="dropdown-item bg-warning border border-white" href="#" onClick={() => setClarity('VS1')}>VS1</a></li>
+                {
+                  initialValues.clarities.slice(3,5).map((clarity) => {
+                    return (
+                      <li key={clarity}>
+                        <a href="#" className="dropdown-item bg-warning border border-white text-white" onClick={() => {claritySelectedHandler(clarity)}}>{clarity}</a>
+                      </li>
+                    )
+                  })
+                }
 
-                <li><a className="dropdown-item bg-primary border border-white" href="#" onClick={() => setClarity('VVS2')}>VVS2</a></li>
-                <li><a className="dropdown-item bg-primary border border-white" href="#" onClick={() => setClarity('VVS1')}>VVS1</a></li>
-                <li><a className="dropdown-item bg-success border border-white" href="#" onClick={() => setClarity('IF')}>IF</a></li>
+                {
+                  initialValues.clarities.slice(5,7).map((clarity) => {
+                    return (
+                      <li key={clarity}>
+                        <a href="#" className="dropdown-item bg-primary border border-white text-white" onClick={() => {claritySelectedHandler(clarity)}}>{clarity}</a>
+                      </li>
+                    )
+                  })
+                }
+
+                {
+                  initialValues.clarities.slice(7,8).map((clarity) => {
+                    return (
+                      <li key={clarity}>
+                        <a href="#" className="dropdown-item bg-success border border-white text-white" onClick={() => {claritySelectedHandler(clarity)}}>{clarity}</a>
+                      </li>
+                    )
+                  })
+                }
+
               </ul>
             </div>
           </div>
@@ -149,25 +289,53 @@ const Mainbody = () => {
                 {color === '' ? 'Color' : color}
               </button>
               <ul className="dropdown-menu" aria-labelledby="colorButton">
-                <li><a className="dropdown-item bg-danger border border-white" href="#" onClick={() => setColor('J')}>J</a></li>
-                <li><a className="dropdown-item bg-danger border border-white" href="#" onClick={() => setColor('I')}>I</a></li>
+                {
+                  initialValues.colors.slice(0,2).map((color) => {
+                    return (
+                      <li key={color}>
+                        <a href="#" className="dropdown-item bg-danger border border-white text-white" onClick={() => colorSelectedHandler(color)}>{color}</a>
+                      </li>
+                    )
+                  })
+                }
 
-                <li><a className="dropdown-item bg-primary border border-white" href="#" onClick={() => setColor('H')}>H</a></li>
-                <li><a className="dropdown-item bg-primary border border-white" href="#" onClick={() => setColor('G')}>G</a></li>
-                <li><a className="dropdown-item bg-primary border border-white" href="#" onClick={() => setColor('F')}>F</a></li>
+                {
+                  initialValues.colors.slice(2,5).map((color) => {
+                    return (
+                      <li key={color}>
+                        <a href="#" className="dropdown-item bg-primary border border-white text-white" onClick={() => colorSelectedHandler(color)}>{color}</a>
+                      </li>
+                    )
+                  })
+                }
 
-                <li><a className="dropdown-item bg-success border border-white" href="#" onClick={() => setColor('E')}>E</a></li>
-                <li><a className="dropdown-item bg-success border border-white" href="#" onClick={() => setColor('D')}>D</a></li>
+                {
+                  initialValues.colors.slice(5,7).map((color) => {
+                    return (
+                      <li key={color}>
+                        <a href="#" className="dropdown-item bg-success border border-white text-white" onClick={() => colorSelectedHandler(color)}>{color}</a>
+                      </li>
+                    )
+                  })
+                }
               </ul>
             </div>
           </div>
         </div>
         <div className='m-3'>
-          <button type='button' className='btn btn-secondary' onClick={valuationButtonHandler}>Get Valuation</button>
+          {clarityErrorMessageOn && <h5 className='text-danger'>Clarity is not selected</h5>}
+          {colorErrorMessageOn && <h5 className='text-danger'>Color is not selected</h5>}
         </div>
         <div className='m-3'>
-          <h2>Est. valuation is: 1800</h2>
+          <button type='button' className='btn btn-secondary' onClick={valuationButtonHandler}>Get Valuation</button>
         </div>
+        {
+          valuation &&
+
+          <div className='m-3'>
+            <h2 className='text-success'>Est. valuation is USD {valuation}</h2>
+          </div>
+        }
       </div>
     </div>
   )
