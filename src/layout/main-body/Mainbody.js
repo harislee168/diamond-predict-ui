@@ -107,13 +107,13 @@ const Mainbody = () => {
     <div>
       <div className='container d-none d-lg-block mt-5'>
         <div className='row'>
-          <div className='col'>
+          <div className='col mt-1'>
             <div>
               <label htmlFor='carat' className='form-label lead'>Carat (Weight of the diamond): {carat} gram</label>
               <input type='range' className='form-range' min={initialValues.min_carat} max={initialValues.max_carat} step='0.01'
                 value={carat} onChange={(e) => setCarat(e.target.value)} id='carat' />
             </div>
-            <div className='mt-3'>
+            <div className='mt-5'>
               <label htmlFor='width' className='form-label lead'>Width of the diamond: {width} mm</label>
               <input type='range' className='form-range' min={initialValues.min_y} max={initialValues.max_y} step='0.01'
                 value={width} onChange={(e) => setWidth(e.target.value)} id='width' />
