@@ -25,7 +25,6 @@ const Mainbody = () => {
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
 
   const valuationButtonHandler = () => {
-    console.log('Carat:' + carat + ' width: ' + width + ' clarity: ' + clarity + ' color: ' + color)
     if (clarity === '') {
       setClarityErrorMessageOn(true)
     }
