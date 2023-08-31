@@ -5,8 +5,8 @@ import SpinnerLoading from '../utils/SpinnerLoading'
 const Mainbody = () => {
   const [carat, setCarat] = useState(1)
   const [width, setWidth] = useState(8)
-  const [clarity, setClarity] = useState('')
-  const [color, setColor] = useState('')
+  const [clarity, setClarity] = useState('VS1')
+  const [color, setColor] = useState('F')
   const [valuation, setValuation] = useState(null)
 
   const [clarityErrorMessageOn, setClarityErrorMessageOn] = useState(false)

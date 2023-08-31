@@ -4,7 +4,7 @@ function Subheader() {
   return (
     <div className='container mt-3'>
       <div className='d-flex justify-content-center align-items-center'>
-        <p className='lead fw-bold'>Crafting Precise Diamond Valuation</p>
+        <p className='lead fw-bold'>Find Out Your Diamond Valuation</p>
       </div>
     </div>
   )
