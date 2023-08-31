@@ -68,3 +68,6 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### You need to create .env file in the root directory
+REACT_APP_API_BASE_URL=http://localhost:8080   <-- this is the backend you need to run. the code can be downloaded from https://github.com/harislee168/diamond-prediction
